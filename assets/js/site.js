@@ -183,10 +183,24 @@
       (st.legs !== 'none' ? ' · ' + ({ caster: 'casters', levcaster: 'leveling casters', leveler: 'leveling feet' })[st.feet] : '') +
       ' · ' + ({ raw: 'raw steel', black: 'black legs', custom: 'custom colour' })[st.finish] + (st.pan && st.legs !== 'none' ? ' · tool pan' : '') + (st.metric ? ' · 16 mm holes' : '');
   }
-  function designerLink() {
+  function designerQuery() {
     const d = design(st), q = new URLSearchParams(); for (const k in d) q.set(k, d[k]); q.set('tier', st.tier);
-    return 'design/?' + q.toString();
+    return q.toString();
   }
+  function designerLink() { return 'design/?' + designerQuery(); }
+  // "Fine-tune in the designer": load this exact table into the designer on the page and scroll to it
+  $('#gft-btn-design').addEventListener('click', e => {
+    const f = $('#gft-designer'); if (!f) return;
+    e.preventDefault();
+    f.src = 'design/app.html?embed=1&' + designerQuery();
+    $('#gft-designer-full').href = designerLink();
+    $('#designer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  // The designer talks to the page it sits in (on the live site: the WooCommerce cart)
+  window.addEventListener('message', e => {
+    const m = e.data; if (!m || typeof m.type !== 'string' || m.type.indexOf('gorilla-tables:') !== 0) return;
+    console.log(m.type, m.order);
+  });
 
   let gen = 0, last = null;
   function render() {
@@ -200,7 +214,6 @@
     $$('[data-finish]').forEach(b => b.classList.toggle('gft-sel', b.dataset.finish === st.finish));
     $('#gft-sum-title').textContent = `${st.w} × ${st.l} ${st.tier === 'files' ? 'files' : st.tier === 'parts' ? 'kit' : 'welded'}`;
     $('#gft-sum-sub').textContent = specString().split(' · ').slice(2).join(' · ');
-    $('#gft-btn-design').href = designerLink();
 
     // this build, plus every alternative the option buttons show a price for
     const jobs = { main: design(st) };

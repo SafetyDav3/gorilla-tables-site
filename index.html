@@ -27,7 +27,7 @@
     <li><a href="#details">The details</a></li>
     <li><a href="#ways">Kit or welded</a></li>
     <li><a href="#configurator">Build yours</a></li>
-    <li><a href="design/">The designer</a></li>
+    <li><a href="#designer">The designer</a></li>
     <li><a href="#shop">The shop</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul></nav>
@@ -41,7 +41,7 @@
       <li><a href="#details">The details</a></li>
       <li><a href="#ways">Kit or welded</a></li>
       <li><a href="#configurator">Build yours</a></li>
-      <li><a href="design/">The designer</a></li>
+      <li><a href="#designer">The designer</a></li>
       <li><a href="#shop">The shop</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
@@ -189,13 +189,13 @@
         <div class="gft-sum-total"><span class="gft-lbl">Total</span><span class="gft-amt" id="gft-sum-total">—</span></div>
         <div class="gft-sum-persq" id="gft-sum-persq"></div>
         <div class="gft-sum-ctas">
-          <a class="gft-btn gft-on-dark" id="gft-btn-design" href="design/">Open in the designer</a>
+          <a class="gft-btn gft-on-dark" id="gft-btn-design" href="#designer">Fine-tune in the designer</a>
           <button type="button" class="gft-btn gft-ghost-dark" id="gft-btn-cart">Add to cart</button>
           <button type="button" class="gft-btn gft-ghost-dark" id="gft-btn-quote">Request a quote</button>
         </div>
         <div class="gft-sum-rated"><span>Rated load</span><b id="gft-sum-rated">—</b></div>
         <div class="gft-sum-rated" style="margin-top:0;padding-top:8px;border:0"><span>Steel</span><b id="gft-sum-weight">—</b></div>
-        <p class="gft-sum-note">Freight quoted at checkout. The designer opens this exact table with a 3D preview and every detail to fine-tune. Questions first? Call <a href="tel:9202469567">920-246-9567</a> and talk to someone who has actually built one.</p>
+        <p class="gft-sum-note">Freight quoted at checkout. The designer below opens this exact table with a 3D preview and every detail to fine-tune. Questions first? Call <a href="tel:9202469567">920-246-9567</a> and talk to someone who has actually built one.</p>
       </aside>
     </div>
   </section>
@@ -204,9 +204,17 @@
     <div class="gft-designer-head gft-reveal">
       <div>
         <h2 class="gft-sec-title">The table designer<span class="gft-cy">.</span></h2>
-        <p class="gft-lede">Every table we sell starts here. Spin it in 3D, change anything down to the rib spacing, and watch the price, weight and rated load update as you go.</p>
+        <p class="gft-lede">Every table we sell starts here. Spin it in 3D, change anything down to the rib spacing, and watch the price, weight and rated load update as you go. It's the same tool our shop builds from.</p>
       </div>
-      <a class="gft-btn" href="design/">Open the designer</a>
+      <a class="gft-btn gft-ghost" href="design/" id="gft-designer-full">Full screen</a>
+    </div>
+    <div class="gft-designer-frame" id="gft-designer-frame">
+      <iframe id="gft-designer" src="design/app.html?embed=1" title="Gorilla Tables designer" loading="lazy" allow="fullscreen"></iframe>
+    </div>
+    <div class="gft-designer-bar">
+      <span>Seven short steps: size, top plate, frame and ribs, legs and stand, finish, etch, then order.</span>
+      <span>Save your design and come back to it any time.</span>
+      <a href="design/">Open full screen &rarr;</a>
     </div>
     <div class="gft-designer-feats gft-reveal">
       <div><b>Live 3D preview</b><p>Top, frame, legs and casters, drawn as you change them. Plan and front views too.</p></div>
