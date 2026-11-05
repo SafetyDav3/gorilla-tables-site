@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The table designer — Gorilla Tables</title>
-<meta name="description" content="Design your fixture table: live price, 3D preview, rated load. Files, kit or fully welded.">
+<title>Design your own table — Gorilla Tables</title>
+<meta name="description" content="Design your fixture-block welding table: any size to 60 x 120, live price, 3D preview, rated load. Files, kit or fully welded.">
+<link rel="canonical" href="https://safetydav3.github.io/gorilla-tables-site/design/">
 <link rel="icon" href="../assets/img/gorilla.png">
 <meta property="og:site_name" content="Gorilla Tables">
-<meta property="og:title" content="The table designer — Gorilla Tables">
-<meta property="og:description" content="Design your fixture table with a live price and 3D preview.">
+<meta property="og:title" content="Design your own table — Gorilla Tables">
+<meta property="og:description" content="Design your fixture-block welding table: any size to 60 x 120, live price, 3D preview, rated load. Files, kit or fully welded.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://safetydav3.github.io/gorilla-tables-site/design/">
 <meta property="og:image" content="https://safetydav3.github.io/gorilla-tables-site/assets/img/og.jpg?v=2">
@@ -18,72 +19,62 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Gorilla Tables: welding tables built for the bold">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="The table designer — Gorilla Tables">
+<meta name="twitter:title" content="Design your own table — Gorilla Tables">
 <meta name="twitter:image" content="https://safetydav3.github.io/gorilla-tables-site/assets/img/og.jpg?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Hanken+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="../assets/css/site.css">
 <style>
-  html, body { height: 100%; margin: 0; background: #f7f5f5; }
-  body.gft-design-page { display: flex; flex-direction: column; min-height: 100vh; }
   body.gft-design-page main.gft-design-stage { padding-top: 0; flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   .gft-design-stage iframe { flex: 1 1 auto; width: 100%; height: calc(100vh - 104px); min-height: 560px; border: 0; display: block; }
   .gft-design-page .gft-hdr { position: sticky; top: 0; }
   @media (max-width: 900px) { .gft-design-stage iframe { height: calc(100vh - 84px); } }
-  .gft-design-page .gft-footer { padding-top: 22px; padding-bottom: 22px; }
 </style>
 </head>
-<body class="gft-design-page">
-
+<body class="gft-page gft-design-page">
 <header class="gft gft-hdr" id="gft-hdr">
   <a class="gft-hdr-logo" href="../">
     <img src="../assets/img/gorilla.png" alt="Gorilla Tables" width="60" height="60">
     <span class="gft-hdr-type"><span class="gft-hdr-l1">GORILLA</span><span class="gft-hdr-l2">Tables</span></span>
   </a>
-  <nav class="gft-hdr-nav"><ul>
-    <li><a href="../#details">The details</a></li>
-    <li><a href="../#ways">Kit or welded</a></li>
-    <li><a href="../#configurator">Build yours</a></li>
-    <li><a href="./" aria-current="page">The designer</a></li>
-    <li><a href="../#shop">The shop</a></li>
-    <li><a href="../#faq">FAQ</a></li>
-  </ul></nav>
+  <nav class="gft-hdr-nav" aria-label="Main"><ul><li><a href="../tables/">Standard tables</a></li><li><a href="../design/" aria-current="page">Design your own</a></li><li><a href="../how/">Kit or welded</a></li><li><a href="../shop/">The shop</a></li><li><a href="../faq/">FAQ</a></li><li><a href="../contact/">Contact</a></li></ul></nav>
   <div class="gft-hdr-right">
     <a class="gft-hdr-tel" href="tel:9202469567">920-246-9567</a>
+    <a class="gft-btn gft-hdr-cta" href="../design/">Build your table</a>
     <button class="gft-hdr-burger" id="gft-hdr-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
   </div>
   <div class="gft-hdr-mobile" id="gft-hdr-mobile">
-    <ul>
-      <li><a href="../#details">The details</a></li>
-      <li><a href="../#ways">Kit or welded</a></li>
-      <li><a href="../#configurator">Build yours</a></li>
-      <li><a href="./">The designer</a></li>
-      <li><a href="../#shop">The shop</a></li>
-      <li><a href="../#faq">FAQ</a></li>
-    </ul>
-    <div class="gft-hdr-mobile-foot"><a class="gft-hdr-tel" href="tel:9202469567">920-246-9567</a></div>
+    <ul><li><a href="../tables/">Standard tables</a></li><li><a href="../design/" aria-current="page">Design your own</a></li><li><a href="../how/">Kit or welded</a></li><li><a href="../shop/">The shop</a></li><li><a href="../faq/">FAQ</a></li><li><a href="../contact/">Contact</a></li></ul>
+    <div class="gft-hdr-mobile-foot"><a class="gft-btn" href="../design/">Build your table</a><a class="gft-hdr-tel" href="tel:9202469567">920-246-9567</a></div>
   </div>
 </header>
 
 <main class="gft-design-stage">
   <iframe id="gft-designer" src="app.html?embed=1" title="Gorilla Tables designer" allow="fullscreen"></iframe>
 </main>
-
-<footer class="gft gft-footer">
-  <div class="gft-footer-logo"><img src="../assets/img/gorilla.png" alt="" width="30" height="30"><span>© 2026 Gerarden Fabrication &amp; Design LLC · Gorilla Tables is a Gerarden Fabrication brand</span></div>
-  <div class="gft-footer-cols"><a href="tel:9202469567">920-246-9567</a><a href="https://gerardenfabrication.com">gerardenfabrication.com</a><span>Denmark, WI</span><a href="../">Home</a><a href="../webdev/">For the web developer</a></div>
-</footer>
-
 <script>
-  // A design in this page's address (from the home page's quick quote) goes through to the designer
+  // A design in this page's address (from a link on the site) goes through to the designer
   (function () {
     var q = location.search.replace(/^\?/, '');
     if (q) document.getElementById('gft-designer').src = 'app.html?embed=1&' + q;
-    var b = document.getElementById('gft-hdr-burger'), m = document.getElementById('gft-hdr-mobile');
-    var h = document.getElementById('gft-hdr');
-    if (b && m) b.addEventListener('click', function () { var on = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', String(on)); h.classList.toggle('gft-hdr-open', on); });
   })();
 </script>
+<footer class="gft gft-footer">
+  <div class="gft-footer-top">
+    <div class="gft-footer-brand">
+      <img src="../assets/img/gorilla.png" alt="" width="44" height="44">
+      <div><b>Gorilla Tables</b><span>Fixture-block welding tables, laser-cut and welded in Denmark, Wisconsin.</span></div>
+    </div>
+    <div class="gft-footer-col"><b>Tables</b><a href="../tables/">Standard tables</a><a href="../design/">Design your own</a><a href="../how/">Kit or welded</a></div>
+    <div class="gft-footer-col"><b>Company</b><a href="../shop/">The shop</a><a href="../faq/">FAQ</a><a href="../contact/">Contact</a><a href="https://gerardenfabrication.com">Gerarden Fabrication</a></div>
+    <div class="gft-footer-col"><b>Get in touch</b><a href="tel:9202469567">920-246-9567</a><a href="mailto:sales@fabricationtables.com">sales@fabricationtables.com</a><span>3190 Water Division Rd · Denmark, WI 54208</span></div>
+  </div>
+  <div class="gft-footer-bottom">
+    <span>© 2026 Gerarden Fabrication &amp; Design LLC · Gorilla Tables is a Gerarden Fabrication brand</span>
+    <span><a href="../legal/terms.html">Terms of sale</a> · <a href="../legal/files.html">File licence</a> · <a href="../legal/privacy.html">Privacy</a> · <a href="../webdev/">For the web developer</a></span>
+  </div>
+</footer>
+<script src="../assets/js/site.js" defer></script>
 </body>
 </html>

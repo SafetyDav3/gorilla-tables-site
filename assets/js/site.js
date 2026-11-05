@@ -1,6 +1,6 @@
 /* Gorilla Tables — front-end
-   Header, hero hotspot explorer, scroll reveal, FAQ, and the quick quote. The quick quote prices every
-   choice with the real table engine (assets/js/engine.js) in a Web Worker, so the page never waits. */
+   Header, hero hotspot explorer, scroll reveal, FAQ, the contact form, and the message channel from the
+   embedded designer. Pricing lives in the designer itself (design/app.html); the pages are static. */
 (function () {
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
@@ -103,170 +103,18 @@
     if (!open) { item.classList.add('gft-open'); a.style.maxHeight = a.scrollHeight + 'px'; }
   }));
 
-  /* ====================================================================
-     QUICK QUOTE: the real engine, in a worker
-     ==================================================================== */
-  const grid = $('#gft-size-grid');
-  if (!grid) return;
-  const SIZES = [[30, 40], [36, 48, 1], [30, 60], [48, 48], [30, 80], [36, 72, 1], [36, 96], [48, 72, 1], [60, 60], [48, 96, 1], [60, 120]];
-  const TIER = { files: 'Files only', parts: 'The kit', built: 'Fully welded' };
-  const st = { w: 48, l: 72, tier: 'built', top: 0.25, legs: 'bolt', feet: 'caster', finish: 'raw', pan: false, metric: false };
-
-  // The design, in the engine's own settings. The same object goes to the designer page and to the cart.
-  function design(s) {
-    const d = { Table_L: s.l, Table_W: s.w, Top_Thick: s.top, Legs: s.legs, Feet: s.feet, Tool_Pan: !!s.pan && s.legs !== 'none',
-      Stand_Color: s.finish === 'black' ? 'Jet Black' : s.finish === 'custom' ? 'Custom' : 'Raw steel' };
-    if (s.finish === 'custom') d.Stand_Custom = 'RAL 1003';
-    if (s.metric) { d.Hole_Dia = 16 / 25.4; d.Hole_Pitch = 50 / 25.4; d.Rib_Spacing = 200 / 25.4; d.Rib_Spacing_Y = 200 / 25.4; }
-    return d;
-  }
-
-  // ---- engine: in a worker when the page allows one, else on the main thread
-  const ENGINE_URL = new URL('assets/js/engine.js', document.baseURI).href;
-  let worker = null, seq = 0, waiting = new Map();
-  const WORKER_SRC = `importScripts(${JSON.stringify(ENGINE_URL)});
-    const E = self.GorillaEngine;
-    function one(d) { const cfg = Object.assign(E.defaults(), d, E.casterPatch(d.Feet || 'caster')); const r = E.compute(cfg, E.DEFAULT_SHOP);
-      if (r.err) return { err: r.err.msg }; const t = {}; for (const x of r.price.tiers) t[x.key] = x.available === false ? null : x.price;
-      return { tiers: t, lb: Math.round(r.totals.lb), rated: r.rating.lb, limit: r.rating.limit.what, warnings: r.warnings.filter(w => !w.minor).map(w => w.msg) }; }
-    self.onmessage = e => { const { id, jobs } = e.data; const out = {}; for (const k in jobs) { try { out[k] = one(jobs[k]); } catch (x) { out[k] = { err: String(x) }; } } self.postMessage({ id, out }); };`;
-  function makeWorker() {
-    try {
-      const w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' })));
-      w.onmessage = e => { const cb = waiting.get(e.data.id); waiting.delete(e.data.id); if (cb) cb(e.data.out); };
-      w.onerror = () => { worker = null; };          // fall back to the main thread
-      return w;
-    } catch (e) { return null; }
-  }
-  function mainThread(jobs) {
-    const E = window.GorillaEngine, out = {};
-    for (const k in jobs) {
-      try {
-        const d = jobs[k], cfg = Object.assign(E.defaults(), d, E.casterPatch(d.Feet || 'caster')); const r = E.compute(cfg, E.DEFAULT_SHOP);
-        if (r.err) { out[k] = { err: r.err.msg }; continue; }
-        const t = {}; for (const x of r.price.tiers) t[x.key] = x.available === false ? null : x.price;
-        out[k] = { tiers: t, lb: Math.round(r.totals.lb), rated: r.rating.lb, limit: r.rating.limit.what, warnings: r.warnings.filter(w => !w.minor).map(w => w.msg) };
-      } catch (x) { out[k] = { err: String(x) }; }
-    }
-    return out;
-  }
-  function price(jobs, cb) {
-    if (worker === null && location.protocol !== 'file:') worker = makeWorker() || false;
-    if (worker) { const id = ++seq; waiting.set(id, cb); worker.postMessage({ id, jobs }); }
-    else if (window.GorillaEngine) setTimeout(() => cb(mainThread(jobs)), 0);
-    else addEventListener('load', () => cb(mainThread(jobs)), { once: true });
-  }
-
-  // ---- the size grid
-  SIZES.forEach(([w, l, pop]) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'gft-size-btn' + (pop ? ' gft-popular' : ''); b.dataset.w = w; b.dataset.l = l;
-    b.innerHTML = '<span class="gft-dims">' + w + '×' + l + '</span><span class="gft-sqft" data-from>' + (w * l / 144).toFixed(1).replace(/\.0$/, '') + ' sq ft</span>';
-    b.addEventListener('click', () => { st.w = w; st.l = l; $('#gft-w').value = w; $('#gft-l').value = l; render(); });
-    grid.appendChild(b);
-  });
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const onSize = () => { st.w = clamp(Math.round(+$('#gft-w').value || 48), 12, 60); st.l = clamp(Math.round(+$('#gft-l').value || 72), 12, 120); if (st.w > st.l) [st.w, st.l] = [st.l, st.w]; render(); };
-  $('#gft-w').addEventListener('change', onSize); $('#gft-l').addEventListener('change', onSize);
-  $$('[data-tier]').forEach(b => b.addEventListener('click', () => { st.tier = b.dataset.tier; render(); }));
-  $$('[data-top]').forEach(b => b.addEventListener('click', () => { st.top = +b.dataset.top; render(); }));
-  $$('[data-legs]').forEach(b => b.addEventListener('click', () => { st.legs = b.dataset.legs; render(); }));
-  $$('[data-feet]').forEach(b => b.addEventListener('click', () => { st.feet = b.dataset.feet; render(); }));
-  $$('[data-finish]').forEach(b => b.addEventListener('click', () => { st.finish = b.dataset.finish; render(); }));
-  $('#gft-opt-pan').addEventListener('change', e => { st.pan = e.target.checked; render(); });
-  $('#gft-opt-metric').addEventListener('change', e => { st.metric = e.target.checked; render(); });
-  $$('[data-preset]').forEach(a => a.addEventListener('click', () => { st.tier = a.dataset.preset; render(); }));
-
-  function specString() {
-    return `${st.w}×${st.l} · ${TIER[st.tier]} · ${st.top === 0.25 ? '1/4"' : st.top === 0.375 ? '3/8"' : '1/2"'} top · ` +
-      ({ bolt: 'bolt-on legs', hframe: 'welded H-frame', kd: 'knock-down H-frame', none: 'top only' })[st.legs] +
-      (st.legs !== 'none' ? ' · ' + ({ caster: 'casters', levcaster: 'leveling casters', leveler: 'leveling feet' })[st.feet] : '') +
-      ' · ' + ({ raw: 'raw steel', black: 'black legs', custom: 'custom colour' })[st.finish] + (st.pan && st.legs !== 'none' ? ' · tool pan' : '') + (st.metric ? ' · 16 mm holes' : '');
-  }
-  function designerQuery() {
-    const d = design(st), q = new URLSearchParams(); for (const k in d) q.set(k, d[k]); q.set('tier', st.tier);
-    return q.toString();
-  }
-  function designerLink() { return 'design/?' + designerQuery(); }
-  // "Fine-tune in the designer": load this exact table into the designer on the page and scroll to it
-  $('#gft-btn-design').addEventListener('click', e => {
-    const f = $('#gft-designer'); if (!f) return;
+  /* ---------- contact form: opens an email with the details (the live site posts it to the shop) ---------- */
+  const form = $('#gft-contact-form');
+  if (form) form.addEventListener('submit', e => {
     e.preventDefault();
-    f.src = 'design/app.html?embed=1&' + designerQuery();
-    $('#gft-designer-full').href = designerLink();
-    $('#designer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const f = new FormData(form), g = k => (f.get(k) || '').toString().trim();
+    const body = `Name: ${g('name')}\nEmail: ${g('email')}\nPhone: ${g('phone')}\nShip-to ZIP: ${g('zip')}\n\n${g('body')}\n`;
+    location.href = 'mailto:sales@fabricationtables.com?subject=' + encodeURIComponent('Quote request from ' + (g('name') || 'the website')) + '&body=' + encodeURIComponent(body);
   });
-  // The designer talks to the page it sits in (on the live site: the WooCommerce cart)
-  window.addEventListener('message', e => {
+
+  /* ---------- the embedded designer talks to the page it sits in (on the live site: the cart) ---------- */
+  addEventListener('message', e => {
     const m = e.data; if (!m || typeof m.type !== 'string' || m.type.indexOf('gorilla-tables:') !== 0) return;
     console.log(m.type, m.order);
-  });
-
-  let gen = 0, last = null;
-  function render() {
-    const g = ++gen;
-    $$('.gft-size-btn').forEach(b => b.classList.toggle('gft-sel', +b.dataset.w === st.w && +b.dataset.l === st.l));
-    $$('[data-tier]').forEach(b => b.classList.toggle('gft-sel', b.dataset.tier === st.tier));
-    $$('[data-top]').forEach(b => b.classList.toggle('gft-sel', +b.dataset.top === st.top));
-    $$('[data-legs]').forEach(b => b.classList.toggle('gft-sel', b.dataset.legs === st.legs));
-    $$('[data-feet]').forEach(b => b.classList.toggle('gft-sel', b.dataset.feet === st.feet));
-    $('#gft-feet-row').style.opacity = st.legs === 'none' ? .4 : 1; $('#gft-feet-row').style.pointerEvents = st.legs === 'none' ? 'none' : '';
-    $$('[data-finish]').forEach(b => b.classList.toggle('gft-sel', b.dataset.finish === st.finish));
-    $('#gft-sum-title').textContent = `${st.w} × ${st.l} ${st.tier === 'files' ? 'files' : st.tier === 'parts' ? 'kit' : 'welded'}`;
-    $('#gft-sum-sub').textContent = specString().split(' · ').slice(2).join(' · ');
-
-    // this build, plus every alternative the option buttons show a price for
-    const jobs = { main: design(st) };
-    const alt = (k, patch) => { jobs[k] = design(Object.assign({}, st, patch)); };
-    alt('t25', { top: 0.25 }); alt('t38', { top: 0.375 }); alt('t50', { top: 0.5 });
-    alt('nolegs', { legs: 'none' }); alt('legs', { legs: st.legs === 'none' ? 'bolt' : st.legs });
-    alt('raw', { finish: 'raw' }); alt('black', { finish: 'black' }); alt('custom', { finish: 'custom' });
-    alt('pan0', { pan: false }); alt('pan1', { pan: true });
-    SIZES.forEach(([w, l]) => alt('s' + w + 'x' + l, { w, l }));
-    price(jobs, out => {
-      if (g !== gen) return;                            // a newer render is on its way
-      last = out;
-      const m = out.main, tier = st.tier;
-      const at = r => (r && !r.err && r.tiers[tier] != null) ? r.tiers[tier] : null;
-      const total = at(m);
-      if (m.err) { $('#gft-sum-total').textContent = '—'; $('#gft-sum-lines').innerHTML = '<div class="gft-sum-line"><span class="gft-k">' + m.err + '</span></div>'; return; }
-      $('#gft-sum-total').textContent = total == null ? 'Quote' : fmt(total);
-      $('#gft-sum-persq').textContent = total == null ? 'Request a quote for this one' : fmt(total / (st.w * st.l / 144)) + ' per sq ft';
-      const lines = [[`${st.w}×${st.l} ${TIER[tier].toLowerCase()}, ${st.top === 0.25 ? '1/4"' : st.top === 0.375 ? '3/8"' : '1/2"'} top`, total == null ? 'quote' : fmt(total)]];
-      $('#gft-sum-lines').innerHTML = lines.map(([k, v]) => `<div class="gft-sum-line"><span class="gft-k">${k}</span><span class="gft-v">${v}</span></div>`).join('') +
-        (m.warnings.length ? `<div class="gft-sum-line"><span class="gft-k" style="color:#F2A33A">${m.warnings[0]}</span></div>` : '');
-      $('#gft-sum-rated').textContent = m.rated.toLocaleString('en-US') + ' lb';
-      $('#gft-sum-weight').textContent = m.lb.toLocaleString('en-US') + ' lb';
-      for (const k of ['files', 'parts', 'built']) { const v = m.tiers[k]; $('#gft-pr-' + k).textContent = v == null ? 'Quote' : fmt(v); }
-      const delta = (key, label) => { const v = at(out[key]); const el = $(label); if (!el) return; el.textContent = v == null || total == null ? '' : v === total ? 'Included' : (v > total ? '+' : '−') + fmt(Math.abs(v - total)); };
-      delta('t38', '#gft-pr-t38'); delta('t50', '#gft-pr-t50'); delta('nolegs', '#gft-pr-nolegs');
-      delta('black', '#gft-pr-black'); delta('custom', '#gft-pr-custom'); delta(st.pan ? 'pan0' : 'pan1', '#gft-pr-pan');
-      if (st.pan) { const v = at(out.pan0); $('#gft-pr-pan').textContent = v == null || total == null ? '' : '+' + fmt(total - v); }
-      $$('.gft-size-btn').forEach(b => { const v = at(out['s' + b.dataset.w + 'x' + b.dataset.l]); $('[data-from]', b).textContent = v == null ? (b.dataset.w * b.dataset.l / 144).toFixed(1).replace(/\.0$/, '') + ' sq ft' : 'from ' + fmt(v); });
-    });
-  }
-  render();
-
-  // "from" prices in the hero and the three cards: the cheapest standard size for each tier
-  price(Object.fromEntries(SIZES.map(([w, l]) => ['s' + w + 'x' + l, design({ w, l, tier: 'built', top: 0.25, legs: 'bolt', feet: 'caster', finish: 'raw' })])), out => {
-    const min = k => Math.min(...Object.values(out).filter(r => !r.err && r.tiers[k] != null).map(r => r.tiers[k]));
-    const f = min('files'), p = min('parts'), b = min('built');
-    if (isFinite(f)) $('#gft-from-files').textContent = fmt(f);
-    if (isFinite(p)) { $('#gft-from-parts').textContent = fmt(p); $('#gft-from-price').textContent = fmt(p); }
-    if (isFinite(b)) $('#gft-from-built').textContent = fmt(b);
-  });
-
-  /* ---- Add to cart (demo) and Request a quote ---- */
-  $('#gft-btn-cart').addEventListener('click', () => {
-    const btn = $('#gft-btn-cart'), total = last && last.main && last.main.tiers[st.tier];
-    btn.textContent = 'Added ✓ (demo)';
-    setTimeout(() => { btn.textContent = 'Add to cart'; }, 2200);
-    // On the live site this is the WooCommerce add-to-cart call, with the design attached to the line item.
-    console.log('gorilla-tables:add-to-cart', { design: design(st), tier: st.tier, price: total, spec: specString() });
-  });
-  $('#gft-btn-quote').addEventListener('click', () => {
-    const total = last && last.main && last.main.tiers[st.tier];
-    const body = `Hi Gorilla Tables,\n\nPlease quote this table:\n${specString()}${total != null ? ' · shown as ' + fmt(total) : ''}.\n\nDesign: ${JSON.stringify(design(st))}\n\nName:\nPhone:\nShip to ZIP:\nAnything else:\n`;
-    location.href = 'mailto:sales@fabricationtables.com?subject=' + encodeURIComponent(`Quote request: ${st.w}x${st.l} fixture table`) + '&body=' + encodeURIComponent(body);
   });
 })();

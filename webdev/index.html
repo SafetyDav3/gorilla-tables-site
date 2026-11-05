@@ -3,90 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gorilla Tables — notes for the web developer</title>
+<title>For the web developer — Gorilla Tables</title>
+<meta name="robots" content="noindex">
 <link rel="icon" href="../assets/img/gorilla.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Hanken+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Hanken+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
-<body>
+<body class="gft-page">
 <header class="gft gft-hdr" id="gft-hdr">
   <a class="gft-hdr-logo" href="../"><img src="../assets/img/gorilla.png" alt="Gorilla Tables" width="60" height="60"><span class="gft-hdr-type"><span class="gft-hdr-l1">GORILLA</span><span class="gft-hdr-l2">Tables</span></span></a>
-  <nav class="gft-hdr-nav"><ul><li><a href="../#configurator">Build yours</a></li><li><a href="../design/">The designer</a></li><li><a href="./">Web developer notes</a></li></ul></nav>
+  <nav class="gft-hdr-nav"><ul><li><a href="../tables/">Standard tables</a></li><li><a href="../design/">Design your own</a></li><li><a href="../how/">Kit or welded</a></li><li><a href="../shop/">The shop</a></li><li><a href="../faq/">FAQ</a></li><li><a href="../contact/">Contact</a></li></ul></nav>
   <div class="gft-hdr-right"><a class="gft-btn gft-hdr-cta" href="../design/">Open the designer</a></div>
 </header>
-<main class="gft gft-doc">
-  <p class="gft-u-label">Gorilla Tables · for the web developer</p>
-  <h1>What this demo is, and how it goes into fabricationtables.com</h1>
-  <p>This site is a static copy of the current fabricationtables.com home page, rebranded to Gorilla Tables, with our table designer added as the product configurator. It exists to show what we want the live site to do. Everything here runs with no server, so you can read every file in the <a href="https://github.com/SafetyDav3/gorilla-tables-site">repository</a>.</p>
+<main>
+<article class="gft gft-doc">
+  <h1>Notes for the web developer</h1>
+  <p>This site is a working example of what we want fabricationtables.com to become: the same look and feel it has now, as a small set of pages, with the Gorilla Tables designer built in as a tool. Everything on it is static HTML, CSS and one script, so it drops into the existing WordPress theme page by page.</p>
 
-  <h2>The three pieces</h2>
+  <h2>The pages</h2>
   <table>
-    <tr><th>Piece</th><th>What it is</th><th>Where it is here</th></tr>
-    <tr><td><b>The engine</b></td><td>Plain JavaScript, no dependencies. Give it a design (an object of settings) and it returns the three prices, steel weight, rated load, parts and warnings in about 30 ms. The same code also produces the laser files, drawings and PDFs in the full app.</td><td><code>assets/js/engine.js</code> (79 KB, 31 KB gzipped)</td></tr>
-    <tr><td><b>The quick quote</b></td><td>The "Build yours" section of the home page. Plain HTML and CSS in the site's own <code>.gft</code> style, plus <code>site.js</code>, which calls the engine in a Web Worker so the page never waits.</td><td><code>index.html</code> and <code>assets/js/site.js</code></td></tr>
-    <tr><td><b>The designer</b></td><td>The full app: 3D preview, every option, hover help, assembly plan. One self-contained HTML file (<code>design/app.html</code>), served as is: no sign-in, no server. It sits in an iframe inside the site's own pages with <code>?embed=1</code>, which drops its brand bar and takes the site's fonts and colours.</td><td><code>design/index.html</code></td></tr>
+    <tr><th>Page</th><th>What it is</th><th>Notes</th></tr>
+    <tr><td><code>/</code></td><td>Home</td><td>Hero with the hotspot explorer, the details, the eleven standard sizes, the three ways to buy, a designer teaser, the shop, final call to action.</td></tr>
+    <tr><td><code>/tables/</code></td><td>Standard tables</td><td>The designer embedded on its Standard tables tab (<code>app.html?embed=1&amp;tab=standard</code>), then the price list and the adders as a plain table for search engines.</td></tr>
+    <tr><td><code>/design/</code></td><td>Design your own</td><td>The designer full screen under the site header. A design in the address is passed through to it.</td></tr>
+    <tr><td><code>/how/</code></td><td>Kit or welded</td><td>Comparison table and the seven assembly steps.</td></tr>
+    <tr><td><code>/shop/</code>, <code>/faq/</code>, <code>/contact/</code></td><td>About, FAQ, contact</td><td>The FAQ carries FAQPage structured data. The contact form opens an email on this demo; on the live site it should post to the shop.</td></tr>
+    <tr><td><code>/legal/</code></td><td>Terms, file licence, privacy</td><td>Drafts marked for DeWitt LLP's review. Not in force.</td></tr>
   </table>
+  <p>All of them are generated from one Python script, <code>tools/build_site.py</code>, so the header, footer and metadata are identical everywhere. You don't need the script; each page's HTML is complete on its own.</p>
+
+  <h2>The designer</h2>
+  <p>One self-contained HTML file, <code>design/app.html</code> (about 1 MB; fonts, 3D viewer and pricing all inside). Serve it as is: no sign-in, no server, no build step. It sits in an iframe inside a normal page with <code>?embed=1</code>, which drops its own brand bar and takes the site's fonts and colours:</p>
+<pre><code>&lt;iframe src="/design/app.html?embed=1" style="width:100%;height:calc(100vh - 104px);border:0"&gt;&lt;/iframe&gt;
+&lt;iframe src="/design/app.html?embed=1&amp;tab=standard" ...&gt;                       the Standard tables tab
+&lt;iframe src="/design/app.html?embed=1&amp;Table_L=96&amp;Table_W=48&amp;Legs=kd&amp;tier=parts" ...&gt;   a preloaded design</code></pre>
+  <p>The customer version is the short one: five steps (Size, Plate, Legs and stand, Finish, Review and order), no etching, none of the shop's fine-detail groups. It has no shop settings, no cost sheet and none of the file-writing code (no DXF, PDF or zip), so there is nothing to download from it: a customer designs, sees the price and orders, and the shop produces the files after the order is approved. The shop keeps its own full build.</p>
 
   <h2>How a design is described</h2>
-  <p>A design is a flat object of settings in inches. The quick quote builds one from its buttons, the designer reads one from the address bar, and the cart line item should carry one so the shop can rebuild the exact table. The defaults are a 48 x 72, 1/4" plate, 6" deep, bolt-on legs on casters, raw steel.</p>
+  <p>A design is a flat object of settings in inches. The designer reads one from the address and writes one into the cart message and the quote email:</p>
 <pre><code>{ "Table_L": 72, "Table_W": 48, "Top_Thick": 0.25, "Legs": "bolt", "Feet": "caster",
-  "Tool_Pan": false, "Stand_Color": "Raw steel" }
+  "Tool_Pan": false, "Stand_Color": "Raw steel", ... }</code></pre>
+  <p>Keep it with the order exactly as given: the shop rebuilds the table from it, and the same object opens in the shop's own copy of the designer for the laser files and the paperwork.</p>
 
-// every key the designer knows works the same way, for example:
-// Mat_Thick (frame plate), Hole_Dia / Hole_Pitch, Rib_Spacing, Table_H (depth), Work_H (working height),
-// Legs: bolt | hframe | kd | none    Feet: caster | levcaster | leveler    Stand_Color: a RAL name or "Custom" + Stand_Custom</code></pre>
-  <p>Open the designer with a design in the address and it loads it: <code>design/?Table_L=96&amp;Table_W=48&amp;Legs=kd&amp;Tool_Pan=true&amp;tier=parts</code>. <code>tier</code> is <code>files</code>, <code>parts</code> or <code>built</code>.</p>
+  <h2>Cart and quote</h2>
+  <p>When a customer presses <b>Add to cart</b>, the designer posts a message to the page it sits in:</p>
+<pre><code>window.addEventListener('message', e =&gt; {
+  if (!e.data || e.data.type !== 'gorilla-tables:add-to-cart') return;
+  const o = e.data.order;   // { tier: 'built' | 'parts' | 'files', price, size, config, rated_lb, weight_lb }
+  // add a WooCommerce line item: name = `${o.size} fixture table, ${o.tierName}`, price = o.price, meta = JSON.stringify(o.config)
+});</code></pre>
+  <p><b>Request a quote</b> opens an email to sales@fabricationtables.com with the design attached. Swap it for a form post if you prefer.</p>
 
-  <h2>Pricing in the browser</h2>
-<pre><code>&lt;script src="assets/js/engine.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  const E = GorillaEngine;
-  const design = Object.assign(E.defaults(), { Table_L: 72, Table_W: 48, Legs: 'kd' }, E.casterPatch('caster'));
-  const r = E.compute(design, E.DEFAULT_SHOP);
-  // r.price.tiers -> [{ key:'files', name:'Files only', price: 66 }, { key:'parts', ... }, { key:'built', ... }]
-  // r.totals.lb (steel weight), r.rating.lb (rated load), r.warnings, r.err (null when the design is buildable)
-&lt;/script&gt;</code></pre>
-  <p><code>E.DEFAULT_SHOP</code> holds every rate the price comes from: steel $/lb, scrap, laser $/hr, labour, casters, powder, crate, markups, the file-set floor. On the live site those numbers come from the WordPress admin page, not from the file.</p>
+  <h2>Prices</h2>
+  <p>The designer prices from the 2026 price list (the same figures as the tables page): standard sizes at the list, custom sizes interpolated between them by area, the list's own adders for 3/8" top, tool pan, no legs, welding and powder, and the cost model only for options the list doesn't name. The price in the browser is what the customer sees; the price that goes on the order should be checked on the server from the design object (same rules, or simply the shop confirming the order before payment is taken).</p>
 
-  <h2>What the live site needs that the demo doesn't have</h2>
-  <ol>
-    <li><b>Prices worked out on the server.</b> The browser can show a live price, but the price that goes on the order must come from the server, from the same engine with the shop's rates from the database. A small Node service runs <code>engine.js</code> unchanged: <code>POST /quote</code> with a design, get the tiers back.</li>
-    <li><b>Add to cart.</b> One WooCommerce product, "Custom fixture table", with the design JSON, tier, and server price on the line item. The demo's Add to cart buttons log the same object to the console and, inside the designer, post a <code>gorilla-tables:add-to-cart</code> message to the parent page.</li>
-    <li><b>Files after payment.</b> For "Files only", the order hook asks the engine service for the job files (<code>POST /files</code>) and gives the customer an expiring download link. The laser files are never made in the browser on the live site.</li>
-    <li><b>Request a quote.</b> The demo opens an email with the design pasted in. On the live site, the existing Gravity Forms quote form with the design JSON in a hidden field.</li>
-    <li><b>Freight at checkout.</b> The engine gives the weight; the LTL plugin quotes from it.</li>
-  </ol>
-  <div class="gft-note">The full plan, with the database tables, admin page, freight, Google sign-in and the phases, is the "Gorilla Tables Website Plan" document Dave has. This page is the short version.</div>
-
-  <h2>Embedding the designer</h2>
-  <p>The designer is one HTML file. On this demo it is embedded twice: in the home page's "The table designer" section and full-screen at <code>/design/</code>, both as an iframe inside a normal site page with the site header above it. A design can be passed in the address:</p>
-<pre><code>&lt;iframe src="/design/app.html?embed=1&amp;Table_L=96&amp;Table_W=48&amp;Legs=kd" style="width:100%;height:calc(100vh - 104px);border:0"&gt;&lt;/iframe&gt;</code></pre>
-  <p>It is built from the private source repository with <code>node tools/build.mjs --customer</code>. The customer build is the short version: five steps (Size, Plate, Legs and stand, Finish, Review and order), no etch step and nothing etched for now, and none of the fine-detail groups the shop uses. It has no shop settings, no cost sheet, and none of the file-writing code at all (no DXF, PDF or zip): a customer designs, sees the price and orders; the shop produces the files after the order is approved. The shop keeps its own build with all of that.</p>
+  <h2>What the live site needs that this demo doesn't have</h2>
+  <ul>
+    <li><b>Checkout.</b> The cart message above into WooCommerce, with freight (LTL by ZIP) and liftgate as options.</li>
+    <li><b>Order approval.</b> Files-only orders are delivered after the shop approves the order (the designer never writes files on the customer's side).</li>
+    <li><b>The contact form</b> posting to the shop instead of opening an email.</li>
+    <li><b>Photos.</b> The hero and product photos are the current site's; more of real Gorilla tables would help.</li>
+  </ul>
 
   <h2>Speed</h2>
   <ul>
-    <li>Pricing a table: about 30 ms. The quick quote prices your build and every alternative on the option buttons (about 25 tables) in the background on each click.</li>
-    <li>The designer: 1.5 MB in one file (fonts and the 3D viewer inside), draws a table in under 100 ms, and keeps the last design on the device.</li>
-    <li>The home page: this HTML, one CSS file, two scripts and five images. No jQuery, no theme scripts.</li>
+    <li>Every page is static: HTML, one CSS file, one small script, fonts from Google. No framework, no build.</li>
+    <li>The designer is one file, loaded once; computing a table takes about 30 ms, the assembly pictures under a second.</li>
+    <li>Images are JPEGs sized for the page and lazy-loaded below the fold.</li>
   </ul>
 
   <h2>Files in this repository</h2>
-<pre><code>index.html              the home page
-design/index.html       the full-screen designer page (site header + iframe)
+<pre><code>index.html, tables/, design/, how/, shop/, faq/, contact/, legal/   the pages
 design/app.html         the designer itself: one self-contained file
-webdev/index.html       this page
-assets/css/site.css     the site's styles (gft.css from the current theme, same tokens)
-assets/js/site.js       header, hero, FAQ and the quick quote
-assets/js/engine.js     the pricing engine
-assets/img/             gorilla.png (logo), hero-table.jpg, table-raw.jpg, table-ribs.jpg, table-powder.jpg</code></pre>
-  <p>Questions: Dave Williams, Gerarden Fabrication, 920-246-9567.</p>
+assets/css/site.css     the site's own styles (gft.css carried over, plus the page layouts)
+assets/js/site.js       header, hero explorer, FAQ, contact form, cart message
+assets/img/             logo, photos, the link-preview card
+tools/build_site.py     generates the pages from one shell
+sitemap.xml, robots.txt, 404.html</code></pre>
+  <div class="gft-note">Questions: Dave at Gerarden Fabrication, 920-246-9567.</div>
+</article>
 </main>
-<footer class="gft gft-footer">
-  <div class="gft-footer-logo"><img src="../assets/img/gorilla.png" alt="" width="30" height="30"><span>© 2026 Gerarden Fabrication &amp; Design LLC</span></div>
-  <div class="gft-footer-cols"><a href="../">Home</a><a href="../design/">The designer</a></div>
-</footer>
+<footer class="gft gft-footer"><div class="gft-footer-bottom"><span>© 2026 Gerarden Fabrication &amp; Design LLC</span><span><a href="../">Home</a> · <a href="../design/">The designer</a></span></div></footer>
 <script src="../assets/js/site.js" defer></script>
 </body>
 </html>
