@@ -26,7 +26,7 @@
     <tr><th>Piece</th><th>What it is</th><th>Where it is here</th></tr>
     <tr><td><b>The engine</b></td><td>Plain JavaScript, no dependencies. Give it a design (an object of settings) and it returns the three prices, steel weight, rated load, parts and warnings in about 30 ms. The same code also produces the laser files, drawings and PDFs in the full app.</td><td><code>assets/js/engine.js</code> (79 KB, 31 KB gzipped)</td></tr>
     <tr><td><b>The quick quote</b></td><td>The "Build yours" section of the home page. Plain HTML and CSS in the site's own <code>.gft</code> style, plus <code>site.js</code>, which calls the engine in a Web Worker so the page never waits.</td><td><code>index.html</code> and <code>assets/js/site.js</code></td></tr>
-    <tr><td><b>The designer</b></td><td>The full app: 3D preview, every option, hover help, assembly plan. One self-contained HTML file, served as is. No sign-in, no server.</td><td><code>design/index.html</code></td></tr>
+    <tr><td><b>The designer</b></td><td>The full app: 3D preview, every option, hover help, assembly plan. One self-contained HTML file, served as is on the live site: no sign-in, no server. On this demo it sits behind a preview password while the tool is in development (Dave has it).</td><td><code>design/index.html</code></td></tr>
   </table>
 
   <h2>How a design is described</h2>
@@ -61,9 +61,9 @@
   <div class="gft-note">The full plan, with the database tables, admin page, freight, Google sign-in and the phases, is the "Gorilla Tables Website Plan" document Dave has. This page is the short version.</div>
 
   <h2>Embedding the designer</h2>
-  <p>The designer is one HTML file. On the live site it is a page of its own, in an iframe or served directly, with the site header above it:</p>
+  <p>The designer is one HTML file. On the live site it is a page of its own (no password), in an iframe or served directly, with the site header above it:</p>
 <pre><code>&lt;iframe src="/design/" style="width:100%;height:calc(100vh - 104px);border:0"&gt;&lt;/iframe&gt;</code></pre>
-  <p>It is built from the private source repository with <code>node tools/build.mjs --customer</code>. The customer build has no shop settings, no cost sheet and no job-folder download; the shop keeps its own build with all of that.</p>
+  <p>It is built from the private source repository with <code>node tools/build.mjs --customer</code>. The customer build has no shop settings, no cost sheet, and none of the file-writing code at all (no DXF, PDF or zip): a customer designs, sees the price and orders; the shop produces the files after the order is approved. The shop keeps its own build with all of that.</p>
 
   <h2>Speed</h2>
   <ul>
@@ -74,7 +74,7 @@
 
   <h2>Files in this repository</h2>
 <pre><code>index.html              the home page
-design/index.html       the designer: one self-contained file
+design/index.html       the designer (preview password during development; the live site serves the plain file)
 webdev/index.html       this page
 assets/css/site.css     the site's styles (gft.css from the current theme, same tokens)
 assets/js/site.js       header, hero, FAQ and the quick quote
