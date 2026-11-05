@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gorilla Tables — notes for the web developer</title>
+<link rel="icon" href="../assets/img/gorilla.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Hanken+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+<header class="gft gft-hdr" id="gft-hdr">
+  <a class="gft-hdr-logo" href="../"><img src="../assets/img/gorilla.png" alt="Gorilla Tables" width="60" height="60"><span class="gft-hdr-type"><span class="gft-hdr-l1">GORILLA</span><span class="gft-hdr-l2">Tables</span></span></a>
+  <nav class="gft-hdr-nav"><ul><li><a href="../#configurator">Build yours</a></li><li><a href="../design/">The designer</a></li><li><a href="./">Web developer notes</a></li></ul></nav>
+  <div class="gft-hdr-right"><a class="gft-btn gft-hdr-cta" href="../design/">Open the designer</a></div>
+</header>
+<main class="gft gft-doc">
+  <p class="gft-u-label">Gorilla Tables · for the web developer</p>
+  <h1>What this demo is, and how it goes into fabricationtables.com</h1>
+  <p>This site is a static copy of the current fabricationtables.com home page, rebranded to Gorilla Tables, with our table designer added as the product configurator. It exists to show what we want the live site to do. Everything here runs with no server, so you can read every file in the <a href="https://github.com/SafetyDav3/gorilla-tables-site">repository</a>.</p>
+
+  <h2>The three pieces</h2>
+  <table>
+    <tr><th>Piece</th><th>What it is</th><th>Where it is here</th></tr>
+    <tr><td><b>The engine</b></td><td>Plain JavaScript, no dependencies. Give it a design (an object of settings) and it returns the three prices, steel weight, rated load, parts and warnings in about 30 ms. The same code also produces the laser files, drawings and PDFs in the full app.</td><td><code>assets/js/engine.js</code> (79 KB, 31 KB gzipped)</td></tr>
+    <tr><td><b>The quick quote</b></td><td>The "Build yours" section of the home page. Plain HTML and CSS in the site's own <code>.gft</code> style, plus <code>site.js</code>, which calls the engine in a Web Worker so the page never waits.</td><td><code>index.html</code> and <code>assets/js/site.js</code></td></tr>
+    <tr><td><b>The designer</b></td><td>The full app: 3D preview, every option, hover help, assembly plan. One self-contained HTML file. On the demo it sits behind a preview password.</td><td><code>design/index.html</code></td></tr>
+  </table>
+
+  <h2>How a design is described</h2>
+  <p>A design is a flat object of settings in inches. The quick quote builds one from its buttons, the designer reads one from the address bar, and the cart line item should carry one so the shop can rebuild the exact table. The defaults are a 48 x 72, 1/4" plate, 6" deep, bolt-on legs on casters, raw steel.</p>
+<pre><code>{ "Table_L": 72, "Table_W": 48, "Top_Thick": 0.25, "Legs": "bolt", "Feet": "caster",
+  "Tool_Pan": false, "Stand_Color": "Raw steel" }
+
+// every key the designer knows works the same way, for example:
+// Mat_Thick (frame plate), Hole_Dia / Hole_Pitch, Rib_Spacing, Table_H (depth), Work_H (working height),
+// Legs: bolt | hframe | kd | none    Feet: caster | levcaster | leveler    Stand_Color: a RAL name or "Custom" + Stand_Custom</code></pre>
+  <p>Open the designer with a design in the address and it loads it: <code>design/?Table_L=96&amp;Table_W=48&amp;Legs=kd&amp;Tool_Pan=true&amp;tier=parts</code>. <code>tier</code> is <code>files</code>, <code>parts</code> or <code>built</code>.</p>
+
+  <h2>Pricing in the browser</h2>
+<pre><code>&lt;script src="assets/js/engine.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const E = GorillaEngine;
+  const design = Object.assign(E.defaults(), { Table_L: 72, Table_W: 48, Legs: 'kd' }, E.casterPatch('caster'));
+  const r = E.compute(design, E.DEFAULT_SHOP);
+  // r.price.tiers -> [{ key:'files', name:'Files only', price: 66 }, { key:'parts', ... }, { key:'built', ... }]
+  // r.totals.lb (steel weight), r.rating.lb (rated load), r.warnings, r.err (null when the design is buildable)
+&lt;/script&gt;</code></pre>
+  <p><code>E.DEFAULT_SHOP</code> holds every rate the price comes from: steel $/lb, scrap, laser $/hr, labour, casters, powder, crate, markups, the file-set floor. On the live site those numbers come from the WordPress admin page, not from the file.</p>
+
+  <h2>What the live site needs that the demo doesn't have</h2>
+  <ol>
+    <li><b>Prices worked out on the server.</b> The browser can show a live price, but the price that goes on the order must come from the server, from the same engine with the shop's rates from the database. A small Node service runs <code>engine.js</code> unchanged: <code>POST /quote</code> with a design, get the tiers back.</li>
+    <li><b>Add to cart.</b> One WooCommerce product, "Custom fixture table", with the design JSON, tier, and server price on the line item. The demo's Add to cart buttons log the same object to the console and, inside the designer, post a <code>gorilla-tables:add-to-cart</code> message to the parent page.</li>
+    <li><b>Files after payment.</b> For "Files only", the order hook asks the engine service for the job files (<code>POST /files</code>) and gives the customer an expiring download link. The laser files are never made in the browser on the live site.</li>
+    <li><b>Request a quote.</b> The demo opens an email with the design pasted in. On the live site, the existing Gravity Forms quote form with the design JSON in a hidden field.</li>
+    <li><b>Freight at checkout.</b> The engine gives the weight; the LTL plugin quotes from it.</li>
+  </ol>
+  <div class="gft-note">The full plan, with the database tables, admin page, freight, Google sign-in and the phases, is the "Gorilla Tables Website Plan" document Dave has. This page is the short version.</div>
+
+  <h2>Embedding the designer</h2>
+  <p>The designer is one HTML file. On the live site it is a page of its own (no password), in an iframe or served directly, with the site header above it:</p>
+<pre><code>&lt;iframe src="/design/" style="width:100%;height:calc(100vh - 104px);border:0"&gt;&lt;/iframe&gt;</code></pre>
+  <p>It is built from the private source repository with <code>node tools/build.mjs --customer</code>. The customer build has no shop settings, no cost sheet and no job-folder download; the shop keeps its own build with all of that.</p>
+
+  <h2>Speed</h2>
+  <ul>
+    <li>Pricing a table: about 30 ms. The quick quote prices your build and every alternative on the option buttons (about 25 tables) in the background on each click.</li>
+    <li>The designer: 1.5 MB in one file (fonts and the 3D viewer inside), draws a table in under 100 ms, and keeps the last design on the device.</li>
+    <li>The home page: this HTML, one CSS file, two scripts and five images. No jQuery, no theme scripts.</li>
+  </ul>
+
+  <h2>Files in this repository</h2>
+<pre><code>index.html              the home page
+design/index.html       the designer (password-locked preview; the live site serves the plain file)
+webdev/index.html       this page
+assets/css/site.css     the site's styles (gft.css from the current theme, same tokens)
+assets/js/site.js       header, hero, FAQ and the quick quote
+assets/js/engine.js     the pricing engine
+assets/img/             gorilla.png (logo), hero-table.jpg, table-raw.jpg, table-ribs.jpg, table-powder.jpg</code></pre>
+  <p>Questions: Dave Williams, Gerarden Fabrication, 920-246-9567.</p>
+</main>
+<footer class="gft gft-footer">
+  <div class="gft-footer-logo"><img src="../assets/img/gorilla.png" alt="" width="30" height="30"><span>© 2026 Gerarden Fabrication &amp; Design LLC</span></div>
+  <div class="gft-footer-cols"><a href="../">Home</a><a href="../design/">The designer</a></div>
+</footer>
+<script src="../assets/js/site.js" defer></script>
+</body>
+</html>
