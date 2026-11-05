@@ -5,7 +5,7 @@ product configurator. It shows the web developer what the live site should do. S
 served at /webdev/) for how the pieces fit and what the live site needs.
 
 - `index.html`: the home page, with a live quick quote run by the real pricing engine in the browser
-- `design/`: the full table designer (preview password required)
+- `design/`: the full table designer, customer version (one self-contained file)
 - `assets/js/engine.js`: the pricing engine (built from the private source repository)
 
 Built from the private repository `SafetyDav3/gorilla-tables-source`. This repository holds only built files.
