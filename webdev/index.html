@@ -31,7 +31,7 @@
     <tr><td><code>/shop/</code>, <code>/faq/</code>, <code>/contact/</code></td><td>About, FAQ, contact</td><td>The FAQ carries FAQPage structured data. The contact form opens an email on this demo; on the live site it should post to the shop.</td></tr>
     <tr><td><code>/legal/</code></td><td>Terms, file licence, privacy</td><td>Drafts marked for DeWitt LLP's review. Not in force.</td></tr>
   </table>
-  <p>All of them are generated from one Python script, <code>tools/build_site.py</code>, so the header, footer and metadata are identical everywhere. You don't need the script; each page's HTML is complete on its own.</p>
+  <p>All of them are generated from one script kept in the private source repository, so the header, footer and metadata are identical everywhere. You don't need the script; each page's HTML is complete on its own.</p>
 
   <h2>The designer</h2>
   <p>One self-contained HTML file, <code>design/app.html</code> (about 1 MB; fonts, 3D viewer and pricing all inside). Serve it as is: no sign-in, no server, no build step. It sits in an iframe inside a normal page with <code>?embed=1</code>, which drops its own brand bar and takes the site's fonts and colours:</p>
@@ -79,7 +79,6 @@ design/app.html         the designer itself: one self-contained file
 assets/css/site.css     the site's own styles (gft.css carried over, plus the page layouts)
 assets/js/site.js       header, hero explorer, FAQ, contact form, cart message
 assets/img/             logo, photos, the link-preview card
-tools/build_site.py     generates the pages from one shell
 sitemap.xml, robots.txt, 404.html</code></pre>
   <div class="gft-note">Questions: Dave at Gerarden Fabrication, 920-246-9567.</div>
 </article>

@@ -6,7 +6,7 @@ served at /webdev/) for how the pieces fit and what the live site needs.
 
 - Pages: `index.html` (home), `tables/` (standard tables: the designer's Standard tables tab, plus the price list), `design/` (the designer full screen), `how/` (kit or welded), `shop/`, `faq/`, `contact/`, `legal/` (drafts for legal review)
 - `design/app.html`: the table designer, customer version (one self-contained file, built from the private source repository)
-- `tools/build_site.py`: generates every page from one shared header, footer and head
+- Every page is generated from one shared header, footer and head by a script in the private repository
 
 Built from the private repository `SafetyDav3/gorilla-tables-source`. This repository holds only built files.
 
