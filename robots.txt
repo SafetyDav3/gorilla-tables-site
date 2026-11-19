@@ -1,3 +1,5 @@
 User-agent: *
-Allow: /
-Sitemap: https://safetydav3.github.io/gorilla-tables-site/sitemap.xml
+Disallow:
+
+# Demo and preview only. The real site is https://fabricationtables.com
+# Every page here is marked noindex; crawling is allowed so that tag can be read.
